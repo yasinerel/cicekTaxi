@@ -62,4 +62,13 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.1.1")) // Firebase BOM
     implementation("com.google.firebase:firebase-database-ktx")          // Realtime Database
     implementation("com.google.android.gms:play-services-location:21.0.1") // Latest version
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("androidx.navigation:navigation-compose:2.7.0")
+    implementation("androidx.compose.material3:material3:1.1.1")
+    implementation("androidx.navigation:navigation-compose:2.6.0")
+    implementation("androidx.compose.ui:ui:1.5.0")
+    implementation("androidx.compose.material3:material3:1.0.0")
+
+
 }

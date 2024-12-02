@@ -2,7 +2,9 @@ package com.example.cicektaxi
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.cicektaxi.ui.theme.CicekTaxiTheme
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -22,6 +25,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 
 class MainActivity : ComponentActivity() {
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,28 +37,19 @@ class MainActivity : ComponentActivity() {
             android.preference.PreferenceManager.getDefaultSharedPreferences(applicationContext)
         )
 
-        // Initialize FusedLocationProviderClient
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // Request location permissions
-        val requestPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                // Permission granted; get location
-                getCurrentLocation()
-            }
-        }
-
-        if (ActivityCompat.checkSelfPermission(
+        // Check location permission
+        if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
+            ) == PackageManager.PERMISSION_GRANTED
         ) {
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        } else {
-            // Permissions already granted; get location
+            // Permissions granted, get the location
             getCurrentLocation()
+        } else {
+            // Request permissions
+            requestPermissionsLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
 
         setContent {
@@ -67,21 +62,19 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun getCurrentLocation() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location: Location? ->
                 location?.let {
-                    updateMapWithLocation(it.latitude, it.longitude)
+                    val latitude = it.latitude
+                    val longitude = it.longitude
+                    // Pass the current location to the MapViewComponent
+                    updateMapWithCurrentLocation(latitude, longitude)
                 }
             }
-        }
     }
 
-    private fun updateMapWithLocation(latitude: Double, longitude: Double) {
-        // Update MapView with the user's current location
+    private fun updateMapWithCurrentLocation(latitude: Double, longitude: Double) {
+        // You can use this function to update your MapView with the current location
         setContent {
             CicekTaxiTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -94,13 +87,24 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    // Request permissions launcher
+    private val requestPermissionsLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                getCurrentLocation()
+            } else {
+                Log.e("LocationPermission", "Permission denied")
+            }
+        }
 }
+
 
 @Composable
 fun MapViewComponent(
     modifier: Modifier = Modifier,
-    userLatitude: Double = 40.261938,
-    userLongitude: Double = 40.225562
+    userLatitude: Double = 41.261938, // default, will be updated dynamically
+    userLongitude: Double = 40.225562  // default, will be updated dynamically
 ) {
     AndroidView(
         factory = { context ->
