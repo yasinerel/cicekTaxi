@@ -69,6 +69,10 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.6.0")
     implementation("androidx.compose.ui:ui:1.5.0")
     implementation("androidx.compose.material3:material3:1.0.0")
+    implementation("androidx.navigation:navigation-compose:2.6.0")
+    implementation("androidx.compose.ui:ui:1.4.0") // or the appropriate version you're using
+    implementation("org.osmdroid:osmdroid-android:6.0.0")  // Or the version of osmdroid you're using
+    implementation("androidx.compose.ui:ui-tooling-preview:1.4.0") // For preview support
 
 
 }

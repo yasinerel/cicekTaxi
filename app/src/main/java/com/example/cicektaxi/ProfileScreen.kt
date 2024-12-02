@@ -1,6 +1,5 @@
 package com.example.cicektaxi
 
-import android.os.Bundle
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
