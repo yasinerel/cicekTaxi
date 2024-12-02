@@ -29,6 +29,8 @@ import org.osmdroid.views.overlay.Marker
 import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -82,6 +84,7 @@ class MainActivity : ComponentActivity() {
         ) {
             // Permissions granted, get the location
             getCurrentLocation()
+            startLocationUpdates()
         } else {
             // Request permissions
             requestPermissionsLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -111,45 +114,33 @@ class MainActivity : ComponentActivity() {
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == RC_SIGN_IN) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            try {
-                val account = task.getResult(Exception::class.java)
-                account?.let {
-                    firebaseAuthWithGoogle(it)
-                }
-            } catch (e: Exception) {
-                Log.e("SignInError", "Google Sign-In failed", e)
-            }
-        }
-    }
-
-    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
-        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    val user = auth.currentUser
-                    Log.d("FirebaseAuth", "User signed in: ${user?.displayName}")
-                } else {
-                    Log.e("FirebaseAuth", "Sign-in failed", task.exception)
-                }
-            }
-    }
-
     private fun getCurrentLocation() {
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
                 location?.let {
                     val latitude = it.latitude
                     val longitude = it.longitude
-                    // Pass the current location to the MapViewComponent
+                    Log.d("LocationUpdate", "New location: Lat: $latitude, Long: $longitude")
+
+                    // Pass the current location to the MapViewScreen
                     updateMapWithCurrentLocation(latitude, longitude)
                 }
             }
+    }
+
+    private fun startLocationUpdates() {
+        // Create a handler to repeat the task every 45 seconds
+        val handler = Handler(Looper.getMainLooper())
+        val runnable = object : Runnable {
+            override fun run() {
+                // Get updated location
+                getCurrentLocation()
+                // Repeat this task every 45 seconds
+                handler.postDelayed(this, 45000)
+            }
+        }
+        // Start location updates
+        handler.post(runnable)
     }
 
     private fun updateMapWithCurrentLocation(latitude: Double, longitude: Double) {
@@ -179,6 +170,7 @@ class MainActivity : ComponentActivity() {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
                 getCurrentLocation()
+                startLocationUpdates()
             } else {
                 Log.e("LocationPermission", "Permission denied")
             }
@@ -188,6 +180,7 @@ class MainActivity : ComponentActivity() {
         private const val RC_SIGN_IN = 9001
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
