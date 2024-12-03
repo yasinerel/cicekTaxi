@@ -15,8 +15,8 @@ import com.example.cicektaxi.ui.theme.CicekTaxiTheme
 @Composable
 fun ProfileScreen() {
     // Mock data for now
-    val userName = "John Doe"
-    val userEmail = "johndoe@example.com"
+    val userName = "DAŞTAN 1"
+    val userEmail = "dastan@dastan.com"
 
     // Profile Screen Layout
     Column(
@@ -28,7 +28,7 @@ fun ProfileScreen() {
     ) {
         // Profile Image Placeholder
         Image(
-            painter = painterResource(id = R.drawable.profile_icon), // Replace with actual user profile image later
+            painter = painterResource(id = R.drawable.aa), // Replace with actual user profile image later
             contentDescription = "Profile Picture",
             modifier = Modifier
                 .size(100.dp)
@@ -37,7 +37,7 @@ fun ProfileScreen() {
 
         // Display User Name and Email
         Text(
-            text = "Name: $userName",
+            text = "İSİM: $userName",
             style = MaterialTheme.typography.headlineMedium
         )
         Text(
@@ -49,12 +49,12 @@ fun ProfileScreen() {
 
         // Ride History Placeholder
         Text(
-            text = "Ride History",
+            text = "Sürüş Geçmişi",
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.primary
         )
         Text(
-            text = "Coming Soon...",
+            text = "Bugün -şu- Rotalarda -bu- Kadar KM Sürdünüz...",
             style = MaterialTheme.typography.bodyMedium,
             color = Color.Gray
         )

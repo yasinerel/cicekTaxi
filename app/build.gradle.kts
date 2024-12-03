@@ -73,6 +73,9 @@ dependencies {
     implementation("androidx.compose.ui:ui:1.4.0") // or the appropriate version you're using
     implementation("org.osmdroid:osmdroid-android:6.0.0")  // Or the version of osmdroid you're using
     implementation("androidx.compose.ui:ui-tooling-preview:1.4.0") // For preview support
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.google.code.gson:gson:2.8.8")
 
 
 }
